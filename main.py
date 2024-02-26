@@ -74,4 +74,4 @@ async def predict(image: UploadFile = File(...)):
     
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=4000)
+    uvicorn.run(app, host="https://senses.onrender.com", port=80)

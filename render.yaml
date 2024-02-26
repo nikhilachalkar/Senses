@@ -1,0 +1,7 @@
+# render.yaml
+
+services:
+- name: my-fastapi-app
+  env: python=3.8
+  build_command: pip install -r requirements.txt
+  start_command: uvicorn main:app --host 0.0.0.0 --port 80 --reload
