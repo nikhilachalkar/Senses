@@ -16,8 +16,8 @@ def process_image_and_draw_contours(image_bytes):
         image_mat = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
 
     
-    # # Apply smoothing to reduce noise
-    #     image_mat = cv2.GaussianBlur(image_mat, (5, 5), 0)
+    # Apply smoothing to reduce noise
+        image_mat = cv2.GaussianBlur(image_mat, (5, 5), 0)
 
     # Apply sharpening to enhance edges
         kernel = np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]], dtype=np.float32)
@@ -28,19 +28,22 @@ def process_image_and_draw_contours(image_bytes):
         gray = cv2.cvtColor(image_mat, cv2.COLOR_BGR2GRAY)
 
     # Create a sketch-like effect and make it bolder
-        sketch = cv2.GaussianBlur(gray, (0, 0), 3)
+        sketch = cv2.GaussianBlur(gray, (0, 0), 5)
         sketch = cv2.addWeighted(gray, 2.0, sketch, -1.0, 0)
 
     # Preprocess the image (e.g., apply blurring or equalization)
         sketch = cv2.GaussianBlur(sketch, (5, 5), 0)
 
     # Apply threshold
-        _, sketch = cv2.threshold(sketch, 128, 255, cv2.THRESH_BINARY)
+        _, sketch = cv2.threshold(sketch, 100, 255, cv2.THRESH_BINARY)
 
-    
+        sketch = cv2.dilate(sketch, None, iterations=2)  # Dilate to make contours thicker
+
 
     # Find contours
-        contours, _ = cv2.findContours(sketch, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+       #contours, _ = cv2.findContours(sketch, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        contours, _ = cv2.findContours(sketch, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)  # Use external contours
+
 
     # Draw contours in red
     # contour_image = np.zeros_like(image_mat)
