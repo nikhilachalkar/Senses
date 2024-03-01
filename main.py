@@ -16,8 +16,8 @@ def process_image_and_draw_contours(image_bytes):
         image_mat = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
 
     
-    # Apply smoothing to reduce noise
-        image_mat = cv2.GaussianBlur(image_mat, (5, 5), 0)
+    # # Apply smoothing to reduce noise
+    #     image_mat = cv2.GaussianBlur(image_mat, (5, 5), 0)
 
     # Apply sharpening to enhance edges
         kernel = np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]], dtype=np.float32)
