@@ -9,53 +9,31 @@ import uvicorn
 
 app = FastAPI()
 
-def process_image_and_draw_contours(image_bytes):
-    
-    try:# Add your existing image processing code here, handling bytes:
-        image_array = np.frombuffer(image_bytes, dtype=np.uint8)
-        image_mat = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+def process_image_and_draw_contours(image_path):
+    try:
+        # Read the image
+        image = cv2.imread(image_path)
 
-    
-    # Apply smoothing to reduce noise
-        image_mat = cv2.GaussianBlur(image_mat, (5, 5), 0)
+        # B, G, R channel splitting
+        blue, _, _ = cv2.split(image)
 
-    # Apply sharpening to enhance edges
-        kernel = np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]], dtype=np.float32)
-        image_mat = cv2.filter2D(image_mat, -1, kernel)
-        
-    # Convert to grayscale
-        gray = cv2.cvtColor(image_mat, cv2.COLOR_BGR2GRAY)
+        # Detect contours using blue channel and without thresholding
+        contours, _ = cv2.findContours(image=blue, mode=cv2.RETR_TREE, method=cv2.CHAIN_APPROX_NONE)
 
-    # Create a sketch-like effect and make it bolder
-        sketch = cv2.GaussianBlur(gray, (0, 0), 5)
-        sketch = cv2.addWeighted(gray, 2.0, sketch, -1.0, 0)
-        
+        # Draw contours on the original image
+        image_contour_blue = image.copy()
+        cv2.drawContours(image=image_contour_blue, contours=contours, contourIdx=-1, color=(0, 255, 0), thickness=2, lineType=cv2.LINE_AA)
 
-
-    # Preprocess the image (e.g., apply blurring or equalization)
-        sketch = cv2.GaussianBlur(sketch, (5, 5), 0)
-
-    # Apply threshold
-        _, sketch = cv2.threshold(sketch, 100, 255, cv2.THRESH_BINARY)
-
-        sketch = cv2.dilate(sketch, None, iterations=2)  # Dilate to make contours thicker
-
-
-    # Find contours
-       #contours, _ = cv2.findContours(sketch, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        #contours, _ = cv2.findContours(sketch, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-        contours, _ = cv2.findContours(sketch, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-
-
-    # Draw contours in red
-    # contour_image = np.zeros_like(image_mat)
-    # cv2.drawContours(contour_image, contours, -1, (0, 0, 255), 1)
-
-    # Create a dictionary to store contour coordinates
+        # Create a dictionary to store contour coordinates
         contour_coordinates = {
-                idx: [(int(point[0][0]), int(point[0][1])) for point in contour]
-                for idx, contour in enumerate(contours)
-            }
+            idx: [(int(point[0][0]), int(point[0][1])) for point in contour]
+            for idx, contour in enumerate(contours)
+        }
+
+        # Display the results
+        cv2_imshow(image_contour_blue)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
         return {"contour_coordinates": contour_coordinates}
 
