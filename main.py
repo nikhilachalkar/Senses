@@ -13,10 +13,9 @@ def process_image_and_draw_contours(image_bytes):
     
     try:# Add your existing image processing code here, handling bytes:
         image_array = np.frombuffer(image_bytes, dtype=np.uint8)
-        image_mat = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+        image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
 
-        # Read the image
-        image = cv2.imread(image_path)
+     
 
         # B, G, R channel splitting
         blue, _, _ = cv2.split(image)
