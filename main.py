@@ -31,9 +31,9 @@ def process_image_and_draw_contours(image_path):
         }
 
         # Display the results
-        cv2_imshow(image_contour_blue)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+        # cv2_imshow(image_contour_blue)
+        # cv2.waitKey(0)
+        # cv2.destroyAllWindows()
 
         return {"contour_coordinates": contour_coordinates}
 
