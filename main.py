@@ -29,7 +29,7 @@ def process_image_and_draw_contours(image_bytes):
 
         # Create a dictionary to store contour coordinates
         contour_coordinates = {
-            idx: [(point[0][0], point[0][1]) for point in contour]
+            idx: [(float(point[0][0]), float(point[0][1])) for point in contour]
             for idx, contour in enumerate(contours)
         }
 
