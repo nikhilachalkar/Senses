@@ -28,11 +28,10 @@ def process_image_and_draw_contours(image_bytes):
         cv2.drawContours(image=image_contour_blue, contours=contours, contourIdx=-1, color=(0, 255, 0), thickness=2, lineType=cv2.LINE_AA)
 
         # Create a dictionary to store contour coordinates
-        contour_coordinates = {
-            idx: [(float(point[0][0]), float(point[0][1])) for point in contour]
-            for idx, contour in enumerate(contours)
-        }
+        contour_coordinates =[]
 
+        for contour in contours:
+            contour_coordinates.append(contour)
         # Display the results
         # cv2_imshow(image_contour_blue)
         # cv2.waitKey(0)
