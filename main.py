@@ -75,7 +75,7 @@ def process_image_and_draw_contours(image_bytes):
                     object_type = ""
             contour_types.append(object_type)        
 
-        return {"contour_coordinates": contour_coordinates,"object-types":contour_types}
+        return contour_coordinates, contour_types
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing image: {str(e)}")
@@ -87,10 +87,10 @@ async def predict(image: UploadFile = File(...)):
         image_bytes = await image.read()
 
         # Preprocess the image
-        contour_coordinates = process_image_and_draw_contours(image_bytes)
+        contour_coordinates,contour_types = process_image_and_draw_contours(image_bytes)
 
         # Return JSON response with contour coordinates
-        return contour_coordinates
+        return {"contour_coordinates": contour_coordinates, "contour_types": contour_types}
 
     except Exception as e:
         return {"error": str(e)}
