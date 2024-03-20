@@ -29,6 +29,7 @@ def process_image_and_draw_contours(image_bytes):
 
         # Create a dictionary to store contour coordinates
         contour_coordinates =[]
+        contour_types = []
 
         for contour in contours:
             contour_coordinates.append(contour)
@@ -36,8 +37,45 @@ def process_image_and_draw_contours(image_bytes):
         # cv2_imshow(image_contour_blue)
         # cv2.waitKey(0)
         # cv2.destroyAllWindows()
+            
 
-        return {"contour_coordinates": contour_coordinates}
+        for contour in contours:
+            # Approximate polygonal curves
+            epsilon = 0.02 * cv2.arcLength(contour, True)
+            approx_curve = cv2.approxPolyDP(contour, epsilon, True)
+
+            # Get the number of corners
+            num_corners = len(approx_curve)
+
+            # Determine the type of object based on the number of corners
+            if num_corners == 3:
+                object_type = "Triangle"
+            elif num_corners == 4:
+                # Check if it's a square or rectangle
+                x, y, w, h = cv2.boundingRect(contour)
+                aspect_ratio = float(w) / h
+                if 0.95 <= aspect_ratio <= 1.05:
+                    object_type = "Square"
+                else:
+                    object_type = "Rectangle"
+            elif num_corners == 5:
+                object_type = "Pentagon"
+            else:
+                # Circle detection based on contour area and circularity
+                area = cv2.contourArea(contour)
+                perimeter = cv2.arcLength(contour, True)
+                circularity = 4 * np.pi * area / (perimeter ** 2)
+                if circularity >= 0.5 and circularity <= 1.5:
+                    # Classify circles based on area
+                    if area < 5000:
+                        object_type = "Small Circle"
+                    else:
+                        object_type = "Large Circle"
+                else:
+                    object_type = ""
+            contour_types.append(object_type)        
+
+        return {"contour_coordinates": contour_coordinates,"object-types":contour_types}
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing image: {str(e)}")
