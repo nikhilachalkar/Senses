@@ -24,14 +24,18 @@ def process_image_and_draw_contours(image_bytes):
         image_array = np.frombuffer(image_bytes, dtype=np.uint8)
         image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
 
-        # Convert the image to grayscale
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+     
 
-        # Threshold the grayscale image
-        _, thresh = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
+        # B, G, R channel splitting
+        blue, _, _ = cv2.split(image)
 
-        # Find contours
-        contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        # Detect contours using blue channel and without thresholding
+        contours, _ = cv2.findContours(image=blue, mode=cv2.RETR_TREE, method=cv2.CHAIN_APPROX_NONE)
+
+        # Draw contours on the original image
+        image_contour_blue = image.copy()
+        cv2.drawContours(image=image_contour_blue, contours=contours, contourIdx=-1, color=(0, 255, 0), thickness=2, lineType=cv2.LINE_AA)
+
 
 
  # Create a dictionary to store contour coordinates
