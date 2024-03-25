@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Request, File, UploadFile
+from fastapi import FastAPI, HTTPException, File, UploadFile
 import cv2
 import numpy as np
 import uvicorn
@@ -34,13 +34,13 @@ def process_image_and_draw_contours(image_bytes):
         contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
         # Store contour coordinates and shapes
-        contour_data = {}
-        for idx, contour in enumerate(contours):
+        contour_data = []
+        for contour in contours:
             shape = detect_shape(contour)
-            coordinates = [(float(point[0][0]), float(point[0][1])) for point in contour]
-            contour_data[idx] = {"contour_coordinates": coordinates, "shape": shape}
+            coordinates = [(int(point[0][0]), int(point[0][1])) for point in contour]
+            contour_data.append({"coordinates": coordinates, "shape": shape})
 
-        return {"contour_data": contour_data}
+        return contour_data
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing image: {str(e)}")
@@ -52,13 +52,14 @@ async def predict(image: UploadFile = File(...)):
         image_bytes = await image.read()
 
         # Preprocess the image and detect contours
-        result = process_image_and_draw_contours(image_bytes)
+        contour_data = process_image_and_draw_contours(image_bytes)
 
         # Return JSON response with contour data
-        return result
+        return {"contours": contour_data}
 
     except Exception as e:
         return {"error": str(e)}
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="https://senses.onrender.com", port=80)
+    # Ensure the correct deployment configuration
+    uvicorn.run(app, host="0.0.0.0", port=80)
