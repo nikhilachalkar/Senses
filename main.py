@@ -5,19 +5,57 @@ import uvicorn
 
 app = FastAPI()
 
+
+def detect(image):
+    # Convert the image to grayscale
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+        # Threshold the grayscale image
+        _, thresh = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
+
+        # Find contours
+        contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+        shape2=[]
+        for contour in contours:
+            shape = detect_shape(contour)
+            shape2.append(shape)
+        return shape2
+
 def detect_shape(contour):
     # Approximate the contour to simplify its shape
     perimeter = cv2.arcLength(contour, True)
-    approx = cv2.approxPolyDP(contour, 0.04 * perimeter, True)
+    approxCurve = cv2.approxPolyDP(contour, 0.02 * perimeter, True)
     
-    # Determine the shape based on the number of vertices
-    num_vertices = len(approx)
-    if num_vertices == 4:
-        return "Rectangle"
-    elif num_vertices >= 6:
-        return "Circle (Big)"
+    # Get the number of corners
+    numCorners = len(approxCurve)
+    
+    # Determine the type of object based on the number of corners
+    if numCorners == 3:
+        return "Triangle"
+    elif numCorners == 4:
+        # Check if it's a square or rectangle
+        x, y, w, h = cv2.boundingRect(contour)
+        aspectRatio = float(w) / h
+        if abs(aspectRatio - 1) < 0.1:
+            return "Square"
+        else:
+            return "Rectangle"
+    elif numCorners == 5:
+        return "Pentagon"
     else:
-        return "Circle (Small)"
+        # Circle detection
+        area = cv2.contourArea(contour)
+        if area > 1000:  # Adjust the area threshold as needed
+            perimeter = cv2.arcLength(contour, True)
+            circularity = 4 * np.pi * area / (perimeter * perimeter)
+            if 0.5 <= circularity <= 1.5:
+                if area < 5000:
+                    return "Small Circle"
+                else:
+                    return "Big Circle"
+    return None
+
 
 def process_image_and_draw_contours(image_bytes):
     try:
@@ -49,9 +87,9 @@ def process_image_and_draw_contours(image_bytes):
         # Store contour coordinates and shapes
         contour_data = []
         shape1=[]
-        for contour in contours:
-            shape = detect_shape(contour)
-            shape1.append(shape)
+
+        shape1=detect(image)
+        
             
         contour_data.append({"coordinates": contour_coordinates, "shape": shape1})
 
