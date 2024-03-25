@@ -33,12 +33,23 @@ def process_image_and_draw_contours(image_bytes):
         # Find contours
         contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
+
+ # Create a dictionary to store contour coordinates
+        contour_coordinates = {
+            idx: [(float(point[0][0]), float(point[0][1])) for point in contour]
+            for idx, contour in enumerate(contours)
+        }
+
+
+
         # Store contour coordinates and shapes
         contour_data = []
+        shape1=[]
         for contour in contours:
             shape = detect_shape(contour)
-            coordinates = [(int(point[0][0]), int(point[0][1])) for point in contour]
-            contour_data.append({"coordinates": coordinates, "shape": shape})
+            shape1.append(shape)
+            
+        contour_data.append({"coordinates": contour_coordinates, "shape": shape1})
 
         return contour_data
 
