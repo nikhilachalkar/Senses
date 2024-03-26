@@ -16,11 +16,11 @@ def detect(image):
         # Find contours
         contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-        shape_and_rectangles = []
+        shape_and_rectangles = {}
         for contour in contours:
             shape, bounding_rect = detect_shape(contour)
-            if shape is not None:
-                shape_and_rectangles.append((shape, bounding_rect))
+        if shape is not None:
+            shape_and_rectangles[shape] = bounding_rect
         return shape_and_rectangles
 
 def detect_shape(contour):
