@@ -16,11 +16,12 @@ def detect(image):
         # Find contours
         contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-        shape2=[]
+        shape_and_rectangles = []
         for contour in contours:
-            shape = detect_shape(contour)
-            shape2.append(shape)
-        return shape2
+            shape, bounding_rect = detect_shape(contour)
+            if shape is not None:
+                shape_and_rectangles.append((shape, bounding_rect))
+        return shape_and_rectangles
 
 def detect_shape(contour):
     # Approximate the contour to simplify its shape
@@ -32,17 +33,17 @@ def detect_shape(contour):
     
     # Determine the type of object based on the number of corners
     if numCorners == 3:
-        return "Triangle"
+        return "Triangle" , cv2.boundingRect(contour)
     elif numCorners == 4:
         # Check if it's a square or rectangle
         x, y, w, h = cv2.boundingRect(contour)
         aspectRatio = float(w) / h
         if abs(aspectRatio - 1) < 0.1:
-            return "Square"
+            return "Square" , cv2.boundingRect(contour)
         else:
-            return "Rectangle"
+            return "Rectangle" , cv2.boundingRect(contour)
     elif numCorners == 5:
-        return "Pentagon"
+        return "Pentagon" , cv2.boundingRect(contour)
     else:
         # Circle detection
         area = cv2.contourArea(contour)
@@ -51,10 +52,10 @@ def detect_shape(contour):
             circularity = 4 * np.pi * area / (perimeter * perimeter)
             if 0.5 <= circularity <= 1.5:
                 if area < 5000:
-                    return "Small Circle"
+                    return "Small Circle" , cv2.boundingRect(contour)
                 else:
-                    return "Big Circle"
-    return None
+                    return "Big Circle" , cv2.boundingRect(contour)
+    return None, None
 
 
 def process_image_and_draw_contours(image_bytes):
@@ -62,7 +63,7 @@ def process_image_and_draw_contours(image_bytes):
         image_array = np.frombuffer(image_bytes, dtype=np.uint8)
         image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
 
-     
+
 
         # B, G, R channel splitting
         blue, _, _ = cv2.split(image)
