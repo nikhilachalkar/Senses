@@ -72,8 +72,8 @@ def process_image_and_draw_contours(image_bytes):
         contours, _ = cv2.findContours(image=blue, mode=cv2.RETR_TREE, method=cv2.CHAIN_APPROX_SIMPLE)
 
         # Draw contours on the original image
-        # image_contour_blue = image.copy()
-        # cv2.drawContours(image=image_contour_blue, contours=contours, contourIdx=-1, color=(0, 255, 0), thickness=2, lineType=cv2.LINE_AA)
+        image_contour_blue = image.copy()
+        cv2.drawContours(image=image_contour_blue, contours=contours, contourIdx=-1, color=(0, 255, 0), thickness=2, lineType=cv2.LINE_AA)
 
 
 
