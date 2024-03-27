@@ -19,8 +19,8 @@ def detect(image):
         shape_and_rectangles = {}
         for contour in contours:
             shape, bounding_rect = detect_shape(contour)
-        if shape is not None:
-            shape_and_rectangles[shape] = bounding_rect
+            if shape is not None:
+                shape_and_rectangles[shape] = bounding_rect
         return shape_and_rectangles
 
 def detect_shape(contour):
