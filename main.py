@@ -7,11 +7,11 @@ app = FastAPI()
 
 
 def detect(image):
-    # Convert the image to grayscale
+        # Convert the image to grayscale
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
         # Threshold the grayscale image
-        _, thresh = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
+        _, thresh = cv2.threshold(gray, 128, 255, cv2.THRESH_BINARY)
 
         # Find contours
         contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -21,6 +21,7 @@ def detect(image):
             shape, bounding_rect = detect_shape(contour)
             if shape is not None:
                 shape_and_rectangles[shape] = bounding_rect
+
         return shape_and_rectangles
 
 def detect_shape(contour):
@@ -64,16 +65,15 @@ def process_image_and_draw_contours(image_bytes):
         image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
 
 
-
         # B, G, R channel splitting
         blue, _, _ = cv2.split(image)
 
         # Detect contours using blue channel and without thresholding
-        contours, _ = cv2.findContours(image=blue, mode=cv2.RETR_TREE, method=cv2.CHAIN_APPROX_NONE)
+        contours, _ = cv2.findContours(image=blue, mode=cv2.RETR_TREE, method=cv2.CHAIN_APPROX_SIMPLE)
 
         # Draw contours on the original image
-        image_contour_blue = image.copy()
-        cv2.drawContours(image=image_contour_blue, contours=contours, contourIdx=-1, color=(0, 255, 0), thickness=2, lineType=cv2.LINE_AA)
+        # image_contour_blue = image.copy()
+        # cv2.drawContours(image=image_contour_blue, contours=contours, contourIdx=-1, color=(0, 255, 0), thickness=2, lineType=cv2.LINE_AA)
 
 
 
