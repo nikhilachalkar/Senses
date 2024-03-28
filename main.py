@@ -26,30 +26,6 @@ def process_image_and_draw_contours(image_bytes):
         image_array = np.frombuffer(image_bytes, dtype=np.uint8)
         image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
 
-        # Convert the image to grayscale
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
-        # Threshold the grayscale image
-        _, thresh = cv2.threshold(gray, 128, 255, cv2.THRESH_BINARY)
-
-        # Find contours
-        contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-
-        
-        detected_shapes = {}
-
-        # Process each contour
-        for idx, contour in enumerate(contours):
-           
-            
-            # Detect shape
-            shape = detect_shape(contour)
-            detected_shapes[idx] = shape
-
-
-        
-     
-
         # B, G, R channel splitting
         blue, _, _ = cv2.split(image)
 
@@ -66,6 +42,16 @@ def process_image_and_draw_contours(image_bytes):
             for idx, contour in enumerate(contours)
         }
 
+        
+        detected_shapes = {}
+
+        # Process each contour
+        for idx, contour in enumerate(contours):
+           
+            
+            # Detect shape
+            shape = detect_shape(contour)
+            detected_shapes[idx] = shape
 
         return {"contour_coordinates": contour_coordinates, "detected_shapes": detected_shapes}
 
