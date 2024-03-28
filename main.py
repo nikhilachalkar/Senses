@@ -6,7 +6,6 @@ import uvicorn
 app = FastAPI()
 
 def detect_shape(contour):
-    # Define the function to detect the shape based on the number of corners
     perimeter = cv2.arcLength(contour, True)
     approxCurve = cv2.approxPolyDP(contour, 0.02 * perimeter, True)
     num_corners = len(approxCurve)
@@ -14,11 +13,24 @@ def detect_shape(contour):
     if num_corners == 3:
         return "Triangle"
     elif num_corners == 4:
-        return "Rectangle" if cv2.contourArea(contour) > 1000 else "Square"
+        x, y, w, h = cv2.boundingRect(contour)
+        aspectRatio = float(w) / h
+        if abs(aspectRatio - 1) < 0.1:
+            return "Square"
+        else:
+            return "Rectangle"
     elif num_corners == 5:
         return "Pentagon"
     else:
-        return "Circle"
+        area = cv2.contourArea(contour)
+        if area > 1000:
+            perimeter = cv2.arcLength(contour, True)
+            circularity = 4 * np.pi * area / (perimeter * perimeter)
+            if 0.5 <= circularity <= 1.5:
+                if area < 5000:
+                    return "Small Circle"
+                else:
+                    return "Big Circle"
 
 def process_image_and_draw_contours(image_bytes):
     try:
