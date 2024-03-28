@@ -109,7 +109,7 @@ async def predict(image: UploadFile = File(...)):
         contour_data = process_image_and_draw_contours(image_bytes)
 
         # Return JSON response with contour data
-        return contour_data
+        return {"contours": contour_data}
 
     except Exception as e:
         return {"error": str(e)}
