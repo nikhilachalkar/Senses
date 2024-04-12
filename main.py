@@ -9,9 +9,10 @@ app = FastAPI()
 def certificates(image_bytes):
     # Decode the image from bytes
     image_array = np.frombuffer(image_bytes, dtype=np.uint8)
-    image_mat = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+    image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
     # Apply smoothing to reduce noise
-    image_mat = cv2.GaussianBlur(image_mat, (5, 5), 0)
+
+    image_mat = cv2.GaussianBlur(image, (5, 5), 0)
 
     # Apply sharpening to enhance edges
     kernel = np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]], dtype=np.float32)
@@ -139,10 +140,10 @@ async def predict(image: UploadFile = File(...)):
         image_bytes = await image.read()
 
         # Process the image and detect contours and shapes
-        contour_data = certificates(image_bytes)
+         
 
         # Return JSON response with contour data
-        return contour_data
+        return certificates(image_bytes)
 
     except Exception as e:
         return {"error": str(e)}
