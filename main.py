@@ -5,9 +5,7 @@ import uvicorn
 
 app = FastAPI()
 
-
-
-def certificates(image_bytes):
+def process_image(image_bytes):
     # Decode the image from bytes
     image_array = np.frombuffer(image_bytes, dtype=np.uint8)
     image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
@@ -38,18 +36,13 @@ def certificates(image_bytes):
     # Find contours
     contours, _ = cv2.findContours(sketch, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-    # Draw contours in red
-    contour_image = np.zeros_like(image)
-    cv2.drawContours(contour_image, contours, -1, (0, 0, 255), 1)
+    # Create a list to store contour coordinates
+    contour_coordinates = []
 
-    # Create a dictionary to store contour coordinates
-    contour_coordinates = {}
-
-    for idx, contour in enumerate(contours):
-        # Extract coordinates as a list of tuples
+    for contour in contours:
+        # Extract coordinates as a list of lists
         coordinates = [(point[0][0], point[0][1]) for point in contour]
-        # Store the coordinates in the dictionary
-        contour_coordinates[idx] = coordinates
+        contour_coordinates.append(coordinates)
 
     return contour_coordinates
 
