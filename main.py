@@ -37,14 +37,14 @@ def certificates(image_bytes):
     contours, _ = cv2.findContours(sketch, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
     # Create a list to store contour coordinates
-    contour_coordinates = []
+    contour_coordinates = {}
 
     for contour in contours:
         # Extract coordinates as a list of lists
         coordinates = [(point[0][0], point[0][1]) for point in contour]
         contour_coordinates.append(coordinates)
 
-    return contour_coordinates
+    return  {"contour_coordinates": contour_coordinates}
 
 def detect_shape(contour):
     perimeter = cv2.arcLength(contour, True)
