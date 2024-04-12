@@ -132,7 +132,7 @@ async def predict(image: UploadFile = File(...)):
     except Exception as e:
         return {"error": str(e)}
 
-@app.post("/predict/certificates/")
+@app.post("/certificates/")
 async def predict(image: UploadFile = File(...)):
     try:
         # Read the uploaded image bytes
