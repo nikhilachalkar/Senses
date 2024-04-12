@@ -5,7 +5,7 @@ import uvicorn
 
 app = FastAPI()
 
-def certificates(image_bytes):
+def certificates(image_bytes: bytes) -> dict:
     try:
         # Decode the image from bytes
         image_array = np.frombuffer(image_bytes, dtype=np.uint8)
