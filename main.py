@@ -6,25 +6,25 @@ import uvicorn
 app = FastAPI()
 
 
+
 def certificates(image_bytes):
     # Decode the image from bytes
     image_array = np.frombuffer(image_bytes, dtype=np.uint8)
     image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
-    # Apply smoothing to reduce noise
 
-    image_mat = cv2.GaussianBlur(image, (5, 5), 0)
+    # Apply smoothing to reduce noise
+    smoothed_image = cv2.GaussianBlur(image, (5, 5), 0)
+
+    # Convert to grayscale
+    gray = cv2.cvtColor(smoothed_image, cv2.COLOR_BGR2GRAY)
 
     # Apply sharpening to enhance edges
     kernel = np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]], dtype=np.float32)
-    image_mat = cv2.filter2D(image_mat, -1, kernel)
-
-
-    # Convert to grayscale
-    gray = cv2.cvtColor(image_mat, cv2.COLOR_BGR2GRAY)
+    sharpened_image = cv2.filter2D(gray, -1, kernel)
 
     # Create a sketch-like effect and make it bolder
-    sketch = cv2.GaussianBlur(gray, (0, 0), 3)
-    sketch = cv2.addWeighted(gray, 2.0, sketch, -1.0, 0)
+    sketch = cv2.GaussianBlur(sharpened_image, (0, 0), 3)
+    sketch = cv2.addWeighted(sharpened_image, 2.0, sketch, -1.0, 0)
 
     # Preprocess the image (e.g., apply blurring or equalization)
     sketch = cv2.GaussianBlur(sketch, (5, 5), 0)
@@ -32,14 +32,14 @@ def certificates(image_bytes):
     # Apply threshold
     _, sketch = cv2.threshold(sketch, 128, 255, cv2.THRESH_BINARY)
 
-   
+    # Invert the sketch
     sketch = cv2.bitwise_not(sketch)
 
     # Find contours
     contours, _ = cv2.findContours(sketch, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
     # Draw contours in red
-    contour_image = np.zeros_like(image_mat)
+    contour_image = np.zeros_like(image)
     cv2.drawContours(contour_image, contours, -1, (0, 0, 255), 1)
 
     # Create a dictionary to store contour coordinates
@@ -51,7 +51,7 @@ def certificates(image_bytes):
         # Store the coordinates in the dictionary
         contour_coordinates[idx] = coordinates
 
-    return  contour_coordinates
+    return contour_coordinates
 
 def detect_shape(contour):
     perimeter = cv2.arcLength(contour, True)
@@ -137,13 +137,13 @@ async def predict(image: UploadFile = File(...)):
 async def predict(image: UploadFile = File(...)):
     try:
         # Read the uploaded image bytes
-        image_bytes = await image.read()
+        image_bytes1 = await image.read()
 
         # Process the image and detect contours and shapes
          
 
         # Return JSON response with contour data
-        return certificates(image_bytes)
+        return certificates(image_bytes1)
 
     except Exception as e:
         return {"error": str(e)}
