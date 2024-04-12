@@ -9,7 +9,7 @@ app = FastAPI()
 def certificates(image_bytes):
     # Decode the image from bytes
     image_array = np.frombuffer(image_bytes, dtype=np.uint8)
-    image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+    image_mat = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
     # Apply smoothing to reduce noise
     image_mat = cv2.GaussianBlur(image_mat, (5, 5), 0)
 
