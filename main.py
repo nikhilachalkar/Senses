@@ -37,18 +37,22 @@ def certificates(image_bytes: bytes) -> dict:
         # Find contours
         contours, _ = cv2.findContours(sketch, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-        # Create a list to store contour coordinates
-        contour_coordinates = []
+         # Create a dictionary to store contour coordinates
+        contour_coordinates = {
+            idx: [(float(point[0][0]), float(point[0][1])) for point in contour]
+            for idx, contour in enumerate(contours)
+        }
+        detected_shapes = {}
 
-        for contour in contours:
-            # Extract coordinates as a list of tuples
-            coordinates = [(point[0][0], point[0][1]) for point in contour]
-            contour_coordinates.append(coordinates)
+        # Process each contour
+        for idx, contour in enumerate(contours):
+           
+            
+            # Detect shape
+            shape = detect_shape(contour)
+            detected_shapes[idx] = shape
 
-        # Convert any numpy arrays to lists
-        contour_coordinates = [list(coord) for coord in contour_coordinates]
-
-        return {"contour_coordinates": contour_coordinates}
+        return {"contour_coordinates": contour_coordinates, "detected_shapes": detected_shapes}
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing image: {str(e)}")
@@ -142,9 +146,9 @@ async def predict(image: UploadFile = File(...)):
 
         # Process the image and detect contours and shapes
          
-
+        result =certificates(image_bytes1)
         # Return JSON response with contour data
-        return certificates(image_bytes1)
+        return result
 
     except Exception as e:
         return {"error": str(e)}
