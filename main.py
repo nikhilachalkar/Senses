@@ -37,7 +37,7 @@ def certificates(image_bytes):
     contours, _ = cv2.findContours(sketch, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
     # Create a list to store contour coordinates
-    contour_coordinates = {}
+    contour_coordinates = []
 
     for contour in contours:
         # Extract coordinates as a list of lists
