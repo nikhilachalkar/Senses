@@ -5,7 +5,7 @@ import uvicorn
 
 app = FastAPI()
 
-def process_image(image_bytes):
+def certificates(image_bytes):
     # Decode the image from bytes
     image_array = np.frombuffer(image_bytes, dtype=np.uint8)
     image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
