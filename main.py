@@ -42,6 +42,20 @@ def certificates(image_bytes: bytes) -> dict:
             idx: [(float(point[0][0]), float(point[0][1])) for point in contour]
             for idx, contour in enumerate(contours)
         }
+
+
+
+        image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+
+        # Convert the image to grayscale
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+        # Threshold the grayscale image
+        _, thresh = cv2.threshold(gray, 128, 255, cv2.THRESH_BINARY)
+
+        # Find contours
+        contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
         detected_shapes = {}
 
         # Process each contour
@@ -107,7 +121,17 @@ def process_image_and_draw_contours(image_bytes):
             for idx, contour in enumerate(contours)
         }
 
-        
+        image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+
+        # Convert the image to grayscale
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+        # Threshold the grayscale image
+        _, thresh = cv2.threshold(gray, 128, 255, cv2.THRESH_BINARY)
+
+        # Find contours
+        contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
         detected_shapes = {}
 
         # Process each contour
